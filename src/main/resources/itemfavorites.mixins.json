@@ -1,0 +1,17 @@
+{
+    "required": true,
+    "minVersion": "0.8",
+    "package": "retr0.itemfavorites.mixin",
+    "compatibilityLevel": "JAVA_17",
+    "injectors": {
+        "defaultRequire": 1
+    },
+    "client": [
+        "MixinHandledScreen"
+    ],
+    "mixins": [
+        "MixinItemStack",
+        "MixinScreenHandler",
+        "MixinSlot"
+    ]
+}
