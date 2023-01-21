@@ -21,6 +21,6 @@
     "mixins": [ "itemfavorites.mixins.json" ],
     "depends": {
         "fabricloader": "*",
-        "minecraft": "*"
+        "minecraft": "~1.19"
     }
 }
