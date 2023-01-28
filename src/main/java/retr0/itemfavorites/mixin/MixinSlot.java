@@ -23,6 +23,6 @@ public abstract class MixinSlot {
     @Inject(method = "getStack", at = @At("RETURN"))
     private void checkInventoryType(CallbackInfoReturnable<ItemStack> cir) {
         if (!(inventory instanceof PlayerInventory))
-            ((ExtensionItemStack) (Object) cir.getReturnValue()).setFavorite(false);
+            ExtensionItemStack.setFavorite(cir.getReturnValue(), false);
     }
 }

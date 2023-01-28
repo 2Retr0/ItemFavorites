@@ -1,8 +1,5 @@
 package retr0.itemfavorites.mixin;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.InputUtil;
@@ -15,12 +12,10 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -28,18 +23,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import retr0.itemfavorites.extension.ExtensionItemStack;
 import retr0.itemfavorites.network.SyncFavoriteItemsC2SPacket;
+import retr0.itemfavorites.util.RenderUtil;
 
 import java.util.Set;
 
 import static net.minecraft.screen.slot.SlotActionType.PICKUP;
-import static retr0.itemfavorites.ItemFavorites.MOD_ID;
 
 @Mixin(HandledScreen.class)
 public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
     @Shadow @Final protected T handler;
     @Shadow @Final protected Set<Slot> cursorDragSlots;
-
-    @Unique private static final Identifier BOOKMARK_TEXTURE = new Identifier(MOD_ID, "textures/gui/bookmark.png");
 
     /**
      * Handles changing the favorite status of item stacks when the favorite shortcut is pressed.
@@ -64,9 +57,9 @@ public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
         if (!isFavoriteShortcutPressed || !isSlotPlayerOwned) return;
 
         var slotStack = slot.getStack();
-        var toggledStatus = !((ExtensionItemStack) (Object) slotStack).isFavorite();
+        var toggledStatus = !ExtensionItemStack.isFavorite(slotStack);
 
-        ((ExtensionItemStack) (Object) slotStack).setFavorite(toggledStatus);
+        ExtensionItemStack.setFavorite(slotStack, toggledStatus);
         SyncFavoriteItemsC2SPacket.send(new SyncFavoriteItemsC2SPacket(handler.syncId, slot.id, toggledStatus));
 
         // noinspection DataFlowIssue // Client and player are non-null while in-game.
@@ -84,27 +77,10 @@ public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
      */
     @Inject(method = "drawSlot", at = @At("TAIL"))
     private void renderSlotBookmark(MatrixStack matrices, Slot slot, CallbackInfo ci) {
-        if (!((ExtensionItemStack) (Object) slot.getStack()).isFavorite()) return;
+        if (!ExtensionItemStack.isFavorite(slot.getStack())) return;
 
         int x = slot.x, y = slot.y - 1;
-        RenderSystem.disableDepthTest();
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShaderTexture(0, BOOKMARK_TEXTURE);
-
-        // Draw bookmark shadow
-        RenderSystem.setShaderColor(0f, 0f, 0f, 0.25f);
-        matrices.push();
-        matrices.translate(0.5f, 0.5f, 0f);
-        drawTexture(matrices, x, y, 0, 0, 16, 16, 16, 16);
-        matrices.pop();
-
-        // Draw bookmark
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        drawTexture(matrices, x, y, 0, 0, 16, 16, 16, 16);
-
-        RenderSystem.enableDepthTest();
-        RenderSystem.disableBlend();
+        RenderUtil.renderBookmark(matrices, x, y, 1f);
     }
 
 
@@ -124,7 +100,7 @@ public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
         Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci)
     {
         var cursorStack = handler.getCursorStack();
-        var cursorHasFavorite = ((ExtensionItemStack) (Object) cursorStack).isFavorite();
+        var cursorHasFavorite = ExtensionItemStack.isFavorite(cursorStack);
 
         if (slot == null) {
             // Cancel dropping a held favorite item (i.e. clicking outside the inventory screen).
@@ -134,7 +110,7 @@ public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
         }
 
         var slotStack = slot.getStack();
-        var slotHasFavorite = ((ExtensionItemStack) (Object) slotStack).isFavorite();
+        var slotHasFavorite = ExtensionItemStack.isFavorite(slotStack);
         var isSlotPlayerOwned = slot.inventory instanceof PlayerInventory;
 
         var depositCount = button != 0 ? 1 : cursorStack.getCount();
@@ -145,9 +121,9 @@ public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
         switch (actionType) {
             case PICKUP -> {
                 if (cursorHasFavorite && !isSlotPlayerOwned)
-                    ((ExtensionItemStack) (Object) cursorStack).setFavorite(false);
+                    ExtensionItemStack.setFavorite(cursorStack, false);
                 else if (cursorHasFavorite && canFullyMerge)
-                    ((ExtensionItemStack) (Object) slotStack).setFavorite(true);
+                    ExtensionItemStack.setFavorite(slotStack, true);
             }
             case QUICK_MOVE -> {
                 // Cancel shift-clicking any favorite item.
@@ -157,7 +133,7 @@ public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
                 @SuppressWarnings("DataFlowIssue") // Client and player are non-null while in-game.
                 var hotbarStack = client.player.getInventory().getStack(button);
                 // Cancel swapping a hotbar favorite item with a slot outside the player inventory.
-                if (((ExtensionItemStack) (Object) hotbarStack).isFavorite() && !isSlotPlayerOwned )
+                if (ExtensionItemStack.isFavorite(hotbarStack) && !isSlotPlayerOwned )
                     ci.cancel();
             }
             case THROW -> {
@@ -166,7 +142,7 @@ public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
             }
             case QUICK_CRAFT -> {
                 if (cursorHasFavorite && canFullyMerge && cursorDragSlots.size() == 1)
-                    ((ExtensionItemStack) (Object) slotStack).setFavorite(true);
+                    ExtensionItemStack.setFavorite(slotStack, true);
             }
         }
     }

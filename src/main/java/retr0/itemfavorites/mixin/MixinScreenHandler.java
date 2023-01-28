@@ -50,8 +50,9 @@ public abstract class MixinScreenHandler {
             target = "Lnet/minecraft/screen/ScreenHandler;calculateStackSize(Ljava/util/Set;ILnet/minecraft/item/ItemStack;I)V"),
         ordinal = 1)
     private ItemStack suppressFavoriteStatus(ItemStack itemStack) {
-        ((ExtensionItemStack) (Object) itemStack).setFavorite(
-            ((ExtensionItemStack) (Object) quickCraftSlot.getStack()).isFavorite());
+        var targetSlotFavoriteStatus = ExtensionItemStack.isFavorite(quickCraftSlot.getStack());
+
+        ExtensionItemStack.setFavorite(itemStack, targetSlotFavoriteStatus);
 
         return itemStack;
     }
@@ -72,6 +73,6 @@ public abstract class MixinScreenHandler {
             target = "Lnet/minecraft/screen/slot/Slot;getStack()Lnet/minecraft/item/ItemStack;"),
         index = 13)
     private ItemStack skipFavoriteItems(ItemStack itemStack) {
-        return ((ExtensionItemStack) (Object) itemStack).isFavorite() ? ItemStack.EMPTY : itemStack;
+        return ExtensionItemStack.isFavorite(itemStack) ? ItemStack.EMPTY : itemStack;
     }
 }

@@ -29,7 +29,7 @@ public record SyncFavoriteItemsC2SPacket(int syncId, int slotId, boolean favorit
 
 
     /**
-     * Executes a quick stack operation for the sender player.
+     * Sets the favorite status of the item stack held in the slot with the id given in the packet.
      */
     public static void receive(
         MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf,
@@ -40,7 +40,6 @@ public record SyncFavoriteItemsC2SPacket(int syncId, int slotId, boolean favorit
         var favoriteStatus = buf.readBoolean();
 
         server.execute(() -> {
-            ItemFavorites.LOGGER.info("Recieved SyncFavoriteItemsC2SPacket!");
             var screenHandler = player.currentScreenHandler;
             if (syncId != screenHandler.syncId) {
                ItemFavorites.LOGGER.warn("Ignoring favorite status update in mismatching container. Click in {}, " +
