@@ -60,7 +60,7 @@ public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
         var toggledStatus = !ExtensionItemStack.isFavorite(slotStack);
 
         ExtensionItemStack.setFavorite(slotStack, toggledStatus);
-        SyncFavoriteItemsC2SPacket.send(new SyncFavoriteItemsC2SPacket(handler.syncId, slot.id, toggledStatus));
+        SyncFavoriteItemsC2SPacket.send(handler.syncId, slot.id, toggledStatus); // Sync changed status with the server.
 
         // noinspection DataFlowIssue // Client and player are non-null while in-game.
         client.player.playSound(toggledStatus ? SoundEvents.BLOCK_BONE_BLOCK_FALL : SoundEvents.BLOCK_BONE_BLOCK_BREAK,

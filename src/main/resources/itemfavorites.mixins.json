@@ -13,6 +13,7 @@
     ],
     "mixins": [
         "MixinItemStack",
+        "MixinPacketByteBuf",
         "MixinScreenHandler",
         "MixinSlot"
     ]
