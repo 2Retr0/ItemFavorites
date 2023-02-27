@@ -18,7 +18,10 @@
     "entrypoints": {
         "main": [ "retr0.itemfavorites.ItemFavorites" ]
     },
-    "mixins": [ "itemfavorites.mixins.json" ],
+    "mixins": [
+        "itemfavorites.mixins.json",
+        "itemfavorites.mixins.inventorysorter.json"
+    ],
     "depends": {
         "fabricloader": "*",
         "minecraft": "~1.19"
