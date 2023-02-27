@@ -6,9 +6,9 @@ plugins {
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
-archivesBaseName = "${project.mod_version}+${project.minecraft_version}"
-version = project.mod_version
-group = project.maven_group
+archivesBaseName = project.archives_base_name
+version          = "${project.mod_version}+${project.minecraft_version}"
+group            = project.maven_group
 
 repositories {
 	maven { url = "https://api.modrinth.com/maven" }
@@ -27,8 +27,8 @@ dependencies {
 
 	// Dev Environment Dependencies
 	modCompileOnly "maven.modrinth:inventory-sorting:${project.inv_sorter_version}"
-	modRuntimeOnly "maven.modrinth:inventory-sorting:${project.inv_sorter_version}"
-	modRuntimeOnly 'net.kyrptonaught:kyrptconfig:1.5.1-1.19.3'
+	modLocalRuntime "maven.modrinth:inventory-sorting:${project.inv_sorter_version}"
+	modLocalRuntime 'net.kyrptonaught:kyrptconfig:1.5.1-1.19.3'
 }
 
 processResources {
