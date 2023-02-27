@@ -55,7 +55,7 @@ public class MixinInventoryHelper {
     }
 
 
-    
+
     /**
      * Merges the sorted + merged non-favorite items with the cached favorite items (retaining their original indices).
      */

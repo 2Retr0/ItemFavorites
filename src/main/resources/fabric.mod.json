@@ -3,7 +3,7 @@
     "id": "itemfavorites",
     "version": "${version}",
     "name": "ItemFavorites",
-    "description": "TBD",
+    "description": "Adds the ability to favorite items in your inventory preventing them from being dropped and more!",
     "authors": [
         "2Retr0"
     ],
