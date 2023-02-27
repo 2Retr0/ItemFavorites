@@ -13,4 +13,4 @@ ItemFavorites is a small mod that allows you to... favorite items! Marking an it
 Download the latest version over at [Modrinth](https://modrinth.com/mod/itemfavorites)!
 
 ## Images
-![Favorite Item Example](https://imgpile.com/images/dSLTKN.png "Favorite Item Example")
+![Favorite Item Example](https://files.catbox.moe/gl07ji.png "Favorite Item Example")
