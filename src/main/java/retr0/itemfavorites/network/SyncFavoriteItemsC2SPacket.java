@@ -56,7 +56,7 @@ public class SyncFavoriteItemsC2SPacket {
             }
 
             var itemStack = slotId >= 0 ? screenHandler.slots.get(slotId).getStack() : screenHandler.getCursorStack();
-            if (!itemStack.isEmpty()) return;
+            if (itemStack.isEmpty()) return;
 
             ((ExtensionItemStack) (Object) itemStack).setFavorite(favoriteStatus);
             screenHandler.syncState();
