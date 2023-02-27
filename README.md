@@ -1,5 +1,5 @@
 # ItemFavorites
-FormidableFarmland is a small mod that allows you to favorite items; favoriting an item consequently:
+ItemFavorites is a small mod that allows you to... favorite items! Marking an item as a favorite consequently:
 
 ## Features
 - **Surpresses vanilla item interactions including**:
