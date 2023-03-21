@@ -1,5 +1,6 @@
 package retr0.itemfavorites.mixin;
 
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.InputUtil;
@@ -12,7 +13,6 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -28,6 +28,7 @@ import retr0.itemfavorites.util.RenderUtil;
 import java.util.Set;
 
 import static net.minecraft.screen.slot.SlotActionType.PICKUP;
+import static retr0.itemfavorites.ItemFavorites.favoriteModifierBinding;
 
 @Mixin(HandledScreen.class)
 public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
@@ -47,11 +48,11 @@ public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
     private void handleFavoriteShortcutKeystroke(
         double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir, boolean bl, Slot slot)
     {
-        if (slot == null || !slot.hasStack()) return;
+        if (slot == null || !slot.hasStack() || button != 0) return;
 
+        var boundKeyCode = KeyBindingHelper.getBoundKeyOf(favoriteModifierBinding).getCode();
         @SuppressWarnings("DataFlowIssue") // Client is non-null while in-game.
-        var isFavoriteShortcutPressed =
-            button == 0 && InputUtil.isKeyPressed(client.getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_ALT);
+        var isFavoriteShortcutPressed = InputUtil.isKeyPressed(client.getWindow().getHandle(), boundKeyCode);
         var isSlotPlayerOwned = slot.inventory instanceof PlayerInventory;
 
         if (!isFavoriteShortcutPressed || !isSlotPlayerOwned) return;
