@@ -42,7 +42,7 @@ public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
         var toggledStatus = !ExtensionItemStack.isFavorite(slotStack);
 
         ExtensionItemStack.setFavorite(slotStack, toggledStatus);
-        SyncFavoriteItemsC2SPacket.send(handler.syncId, slot.id - 1, toggledStatus); // Sync changed status with the server.
+        SyncFavoriteItemsC2SPacket.send(handler.syncId, slot.id, toggledStatus); // Sync changed status with the server.
 
         // noinspection DataFlowIssue // Client and player are non-null while in-game.
         client.player.playSound(toggledStatus ? SoundEvents.BLOCK_BONE_BLOCK_FALL : SoundEvents.BLOCK_BONE_BLOCK_BREAK,
@@ -71,7 +71,8 @@ public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
         var isFavoriteShortcutPressed = InputUtil.isKeyPressed(client.getWindow().getHandle(), boundKeyCode);
         var isSlotPlayerOwned = slot.inventory instanceof PlayerInventory;
 
-        if (!isFavoriteShortcutPressed || !isSlotPlayerOwned) return;
+        if (!isFavoriteShortcutPressed || !isSlotPlayerOwned || !handler.getCursorStack().isEmpty())
+            return;
 
         toggleFavoriteStatus(slot);
         cir.setReturnValue(true);
@@ -141,7 +142,7 @@ public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
                 @SuppressWarnings("DataFlowIssue") // Client and player are non-null while in-game.
                 var hotbarStack = client.player.getInventory().getStack(button);
                 // Cancel swapping a hotbar favorite item with a slot outside the player inventory.
-                if (ExtensionItemStack.isFavorite(hotbarStack) && !isSlotPlayerOwned )
+                if (ExtensionItemStack.isFavorite(hotbarStack) && !isSlotPlayerOwned)
                     ci.cancel();
             }
             case THROW -> {
