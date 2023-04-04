@@ -16,6 +16,7 @@ public class RenderUtil {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShaderTexture(0, BOOKMARK_TEXTURE);
+        var originalColor = RenderSystem.getShaderColor();
 
         // Draw bookmark shadow
         RenderSystem.setShaderColor(0f, 0f, 0f, alpha * 0.25f);
@@ -28,6 +29,7 @@ public class RenderUtil {
         RenderSystem.setShaderColor(1f, 1f, 1f, alpha);
         DrawableHelper.drawTexture(matrices, x, y, 0, 0, 16, 16, 16, 16);
 
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         RenderSystem.enableDepthTest();
         RenderSystem.disableBlend();
     }

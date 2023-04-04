@@ -16,6 +16,7 @@ import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -34,6 +35,21 @@ import static retr0.itemfavorites.ItemFavorites.favoriteModifierBinding;
 public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
     @Shadow @Final protected T handler;
     @Shadow @Final protected Set<Slot> cursorDragSlots;
+
+    @Unique
+    private void toggleFavoriteStatus(Slot slot) {
+        var slotStack = slot.getStack();
+        var toggledStatus = !ExtensionItemStack.isFavorite(slotStack);
+
+        ExtensionItemStack.setFavorite(slotStack, toggledStatus);
+        SyncFavoriteItemsC2SPacket.send(handler.syncId, slot.id - 1, toggledStatus); // Sync changed status with the server.
+
+        // noinspection DataFlowIssue // Client and player are non-null while in-game.
+        client.player.playSound(toggledStatus ? SoundEvents.BLOCK_BONE_BLOCK_FALL : SoundEvents.BLOCK_BONE_BLOCK_BREAK,
+                SoundCategory.BLOCKS, 0.25f, client.player.clientWorld.random.nextFloat() * 0.1f + 0.9f);
+    }
+
+
 
     /**
      * Handles changing the favorite status of item stacks when the favorite shortcut is pressed.
@@ -57,16 +73,7 @@ public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
 
         if (!isFavoriteShortcutPressed || !isSlotPlayerOwned) return;
 
-        var slotStack = slot.getStack();
-        var toggledStatus = !ExtensionItemStack.isFavorite(slotStack);
-
-        ExtensionItemStack.setFavorite(slotStack, toggledStatus);
-        SyncFavoriteItemsC2SPacket.send(handler.syncId, slot.id, toggledStatus); // Sync changed status with the server.
-
-        // noinspection DataFlowIssue // Client and player are non-null while in-game.
-        client.player.playSound(toggledStatus ? SoundEvents.BLOCK_BONE_BLOCK_FALL : SoundEvents.BLOCK_BONE_BLOCK_BREAK,
-            SoundCategory.BLOCKS, 0.25f, client.player.clientWorld.random.nextFloat() * 0.1f + 0.9f);
-
+        toggleFavoriteStatus(slot);
         cir.setReturnValue(true);
         cir.cancel();
     }
@@ -90,14 +97,14 @@ public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
      * Suppresses some actions on favorite items and implements some conditions for when favorite items should be
      * created/destroyed (other conditions are handled in {@link MixinItemStack}, {@link MixinScreenHandler}, and
      * {@link MixinSlot}).
+     *
+     * @see MixinCreativeInventoryScreen#handleFavoriteItemInteractions(Slot, int, int, SlotActionType, CallbackInfo)
      */
     @Inject(
         method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;clickSlot(IIILnet/minecraft/screen/slot/SlotActionType;Lnet/minecraft/entity/player/PlayerEntity;)V"),
+        at = @At("HEAD"),
         cancellable = true)
-    private void handleFavoriteItemInteractions(
+    protected void handleFavoriteItemInteractions(
         Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci)
     {
         var cursorStack = handler.getCursorStack();
@@ -116,8 +123,8 @@ public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
 
         var depositCount = button != 0 ? 1 : cursorStack.getCount();
         var canFullyMerge = ItemStack.canCombine(cursorStack, slotStack)
-            && slotStack.getMaxCount() >= slotStack.getCount() + depositCount
-            && cursorStack.getCount() == depositCount;
+                && slotStack.getMaxCount() >= slotStack.getCount() + depositCount
+                && cursorStack.getCount() == depositCount;
 
         switch (actionType) {
             case PICKUP -> {

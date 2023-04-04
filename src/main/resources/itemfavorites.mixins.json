@@ -7,11 +7,13 @@
         "defaultRequire": 1
     },
     "client": [
+        "MixinCreativeInventoryScreen",
         "MixinClientPlayerEntity",
         "MixinHandledScreen",
         "MixinInGameHud"
     ],
     "mixins": [
+        "MixinItemEntity",
         "MixinItemStack",
         "MixinPacketByteBuf",
         "MixinScreenHandler",
