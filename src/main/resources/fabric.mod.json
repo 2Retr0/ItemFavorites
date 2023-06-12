@@ -16,7 +16,8 @@
     "icon": "assets/itemfavorites/icon.png",
     "environment": "*",
     "entrypoints": {
-        "main": [ "retr0.itemfavorites.ItemFavorites" ]
+        "main":   [ "retr0.itemfavorites.ItemFavorites" ],
+        "client": [ "retr0.itemfavorites.ItemFavoritesClient" ]
     },
     "mixins": [
         "itemfavorites.mixins.json",
@@ -25,6 +26,6 @@
     "depends": {
         "fabricloader": "*",
         "fabric-api": "*",
-        "minecraft": "~1.19"
+        "minecraft": "~1.20"
     }
 }

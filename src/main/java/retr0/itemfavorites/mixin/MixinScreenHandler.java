@@ -5,13 +5,16 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import retr0.itemfavorites.extension.ExtensionItemStack;
 
 @Mixin(ScreenHandler.class)
 public abstract class MixinScreenHandler {
+    @Shadow private ItemStack cursorStack;
     @Unique private Slot quickCraftSlot;
 
     /**
@@ -25,8 +28,9 @@ public abstract class MixinScreenHandler {
         method = "internalOnSlotClick",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/screen/ScreenHandler;calculateStackSize(Ljava/util/Set;ILnet/minecraft/item/ItemStack;I)V",
-            shift = At.Shift.BEFORE),
+            target = "Lnet/minecraft/screen/slot/Slot;getMaxItemCount(Lnet/minecraft/item/ItemStack;)I",
+            shift = At.Shift.BEFORE,
+            ordinal = 0),
         ordinal = 0)
     private Slot cacheQuickCraftSlot(Slot slot) {
         quickCraftSlot = slot;
@@ -40,15 +44,13 @@ public abstract class MixinScreenHandler {
      * Prevents all resulting copied item stacks from a {@link SlotActionType#QUICK_CRAFT} from being favorites unless
      * the stack they're combined with is already a favorite.
      */
-    /* [ 10]    [  0]                            Slot  slot2                                               -         */
-    /* [ 11]                                        -                                                                */
-    /* [ 12]    [  1]                       ItemStack  itemStack4                                        >>YES<<     */
-    @ModifyVariable(
+    @ModifyArg(
         method = "internalOnSlotClick",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/screen/ScreenHandler;calculateStackSize(Ljava/util/Set;ILnet/minecraft/item/ItemStack;I)V"),
-        ordinal = 1)
+            target = "Lnet/minecraft/screen/slot/Slot;getMaxItemCount(Lnet/minecraft/item/ItemStack;)I",
+            ordinal = 0),
+        index = 0)
     private ItemStack suppressFavoriteStatus(ItemStack itemStack) {
         var targetSlotFavoriteStatus = ExtensionItemStack.isFavorite(quickCraftSlot.getStack());
 

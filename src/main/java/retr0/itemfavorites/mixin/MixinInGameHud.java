@@ -1,7 +1,7 @@
 package retr0.itemfavorites.mixin;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -43,13 +43,13 @@ public abstract class MixinInGameHud implements ExtensionInGameHud {
      * Renders the bookmark sprite with the alpha only decreasing in the latter half of the initial set time.
      */
     @Inject(method = "renderHotbar", at = @At("TAIL"))
-    private void renderBookmark(float tickDelta, MatrixStack matrices, CallbackInfo ci) {
+    private void renderBookmark(float tickDelta, DrawContext context, CallbackInfo ci) {
         var selectedSlot = getCameraPlayer().getInventory().selectedSlot;
 
         if (bookmarkFade == 0 || selectedSlot != bookmarkSlot) return;
 
         int x = (scaledWidth / 2) - 88 + selectedSlot * 20,
             y = scaledHeight - 19;
-        RenderUtil.renderBookmark(matrices, x, y, bookmarkFade / bookmarkFadeDivisor);
+        RenderUtil.renderBookmark(context, x, y, bookmarkFade / bookmarkFadeDivisor);
     }
 }

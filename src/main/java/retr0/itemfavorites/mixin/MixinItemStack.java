@@ -14,7 +14,7 @@ import retr0.itemfavorites.extension.ExtensionItemStack;
 
 @Mixin(ItemStack.class)
 public abstract class MixinItemStack implements ExtensionItemStack {
-    @Shadow private boolean empty;
+    @Shadow public abstract boolean isEmpty();
 
     @Unique private static final String FAVORITE_KEY = "Favorite";
     @Unique private boolean isFavorite = false;
@@ -26,7 +26,7 @@ public abstract class MixinItemStack implements ExtensionItemStack {
 
     @Override
     public boolean isFavorite() {
-        return !empty && isFavorite;
+        return !isEmpty() && isFavorite;
     }
 
 
@@ -49,7 +49,7 @@ public abstract class MixinItemStack implements ExtensionItemStack {
         int amount, CallbackInfoReturnable<ExtensionItemStack> cir, int countDecrement)
     {
         // For any splits where the stack is not completely transferred to the copy, we ensure the copy is not a favorite.
-        if (empty && countDecrement > 0) return;
+        if (isEmpty() && countDecrement > 0) return;
 
         var copiedStack = cir.getReturnValue();
         copiedStack.setFavorite(false);

@@ -1,10 +1,10 @@
 package retr0.itemfavorites.mixin;
 
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
@@ -29,7 +29,7 @@ import retr0.itemfavorites.util.RenderUtil;
 import java.util.Set;
 
 import static net.minecraft.screen.slot.SlotActionType.PICKUP;
-import static retr0.itemfavorites.ItemFavorites.favoriteModifierBinding;
+import static retr0.itemfavorites.ItemFavoritesClient.favoriteModifierBinding;
 
 @Mixin(HandledScreen.class)
 public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
@@ -85,11 +85,11 @@ public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
      * Renders the bookmark texture on slots containing favorite items.
      */
     @Inject(method = "drawSlot", at = @At("TAIL"))
-    private void renderSlotBookmark(MatrixStack matrices, Slot slot, CallbackInfo ci) {
+    private void renderSlotBookmark(DrawContext context, Slot slot, CallbackInfo ci) {
         if (!ExtensionItemStack.isFavorite(slot.getStack())) return;
 
         int x = slot.x, y = slot.y - 1;
-        RenderUtil.renderBookmark(matrices, x, y, 1f);
+        RenderUtil.renderBookmark(context, x, y, 1f);
     }
 
 
@@ -112,7 +112,7 @@ public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
         var cursorHasFavorite = ExtensionItemStack.isFavorite(cursorStack);
 
         if (slot == null) {
-            // Cancel dropping a held favorite item (i.e. clicking outside the inventory screen).
+            // Cancel dropping a held favorite item (i.e., clicking outside the inventory screen).
             if (actionType == PICKUP && slotId == ScreenHandler.EMPTY_SPACE_SLOT_INDEX && cursorHasFavorite)
                 ci.cancel();
             return;
