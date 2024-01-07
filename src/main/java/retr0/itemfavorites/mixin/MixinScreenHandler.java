@@ -67,7 +67,6 @@ public abstract class MixinScreenHandler {
     /* [ 11]    [  5]                             int  p                                                   -         */
     /* [ 12]    [  1]                            Slot  slot4                                               -         */
     /* [ 13]    [  1]                       ItemStack  itemStack6                                        >>YES<<     */
-    @SuppressWarnings("InvalidInjectorMethodSignature")
     @ModifyVariable(
         method = "internalOnSlotClick",
         at = @At(
