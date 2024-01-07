@@ -1,22 +1,23 @@
 {
-    "required": true,
-    "minVersion": "0.8",
-    "package": "retr0.itemfavorites.mixin",
-    "compatibilityLevel": "JAVA_17",
-    "injectors": {
-        "defaultRequire": 1
-    },
-    "client": [
-        "MixinCreativeInventoryScreen",
-        "MixinClientPlayerEntity",
-        "MixinHandledScreen",
-        "MixinInGameHud"
-    ],
-    "mixins": [
-        "MixinItemEntity",
-        "MixinItemStack",
-        "MixinPacketByteBuf",
-        "MixinScreenHandler",
-        "MixinSlot"
-    ]
+  "required": true,
+  "minVersion": "0.8",
+  "package": "retr0.itemfavorites.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "MixinClientPlayerEntity",
+    "MixinCreativeInventoryScreen",
+    "MixinHandledScreen",
+    "MixinInGameHud"
+  ],
+  "mixins": [
+    "MixinItemEntity",
+    "MixinItemStack",
+    "MixinPacketByteBuf",
+    "MixinScreenHandler",
+    "MixinServerPlayerEntity",
+    "MixinSlot"
+  ]
 }
