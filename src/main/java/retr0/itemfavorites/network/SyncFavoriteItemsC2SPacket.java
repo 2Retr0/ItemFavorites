@@ -1,5 +1,7 @@
 package retr0.itemfavorites.network;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -24,6 +26,7 @@ public class SyncFavoriteItemsC2SPacket {
      * @param slotId The {@code slotId} for the slot to be synced.
      * @param favoriteStatus The altered favorite status of the {@link ItemStack} associated with the slot.
      */
+    @Environment(EnvType.CLIENT)
     public static void send(int syncId, int slotId, boolean favoriteStatus) {
         var buf = PacketByteBufs.create();
 
@@ -33,8 +36,6 @@ public class SyncFavoriteItemsC2SPacket {
 
         ClientPlayNetworking.send(SYNC_FAVORITE_ITEMS_ID, buf);
     }
-
-
 
     /**
      * Sets the favorite status of the item stack held in the slot with the {@code slotId} from the packet.

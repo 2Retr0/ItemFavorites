@@ -1,5 +1,7 @@
 package retr0.itemfavorites.mixin;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -24,20 +26,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import retr0.itemfavorites.extension.ExtensionItemStack;
 import retr0.itemfavorites.network.SyncFavoriteItemsC2SPacket;
+import retr0.itemfavorites.util.ModUsageManager;
 import retr0.itemfavorites.util.RenderUtil;
 
 import java.util.Set;
 
 import static net.minecraft.screen.slot.SlotActionType.PICKUP;
-import static retr0.itemfavorites.ItemFavoritesClient.favoriteModifierBinding;
+import static retr0.itemfavorites.ItemFavoritesClient.FAVORITE_MODIFIER_BINDING;
 
 @Mixin(HandledScreen.class)
 public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
     @Shadow @Final protected T handler;
     @Shadow @Final protected Set<Slot> cursorDragSlots;
 
-    @Unique
+    @Unique @Environment(EnvType.CLIENT)
     private void toggleFavoriteStatus(Slot slot) {
+        if (!ModUsageManager.doesServerUseMod()) return;
+
         var slotStack = slot.getStack();
         var toggledStatus = !ExtensionItemStack.isFavorite(slotStack);
 
@@ -66,7 +71,7 @@ public class MixinHandledScreen<T extends ScreenHandler> extends Screen {
     {
         if (slot == null || !slot.hasStack() || button != 0) return;
 
-        var boundKeyCode = KeyBindingHelper.getBoundKeyOf(favoriteModifierBinding).getCode();
+        var boundKeyCode = KeyBindingHelper.getBoundKeyOf(FAVORITE_MODIFIER_BINDING).getCode();
         @SuppressWarnings("DataFlowIssue") // Client is non-null while in-game.
         var isFavoriteShortcutPressed = InputUtil.isKeyPressed(client.getWindow().getHandle(), boundKeyCode);
         var isSlotPlayerOwned = slot.inventory instanceof PlayerInventory;

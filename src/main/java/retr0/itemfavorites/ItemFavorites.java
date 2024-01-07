@@ -4,6 +4,7 @@ import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retr0.itemfavorites.network.PacketRegistry;
+import retr0.itemfavorites.util.ModUsageManager;
 
 public class ItemFavorites implements ModInitializer {
     public static final String MOD_ID = "itemfavorites";
@@ -18,6 +19,8 @@ public class ItemFavorites implements ModInitializer {
         // However, some things (like resources) may still be uninitialized.
         // Proceed with mild caution.
         LOGGER.info("Initialized ItemFavorites!");
+
         PacketRegistry.registerC2SPackets();
+        ModUsageManager.init();
     }
 }

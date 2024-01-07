@@ -1,12 +1,15 @@
 package retr0.itemfavorites.util;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Unique;
 
 import static retr0.itemfavorites.ItemFavorites.MOD_ID;
 
+@Environment(EnvType.CLIENT)
 public class RenderUtil {
     @Unique private static final Identifier BOOKMARK_TEXTURE = new Identifier(MOD_ID, "textures/gui/bookmark.png");
 

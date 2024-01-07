@@ -12,6 +12,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import retr0.itemfavorites.extension.ExtensionInGameHud;
 import retr0.itemfavorites.util.RenderUtil;
 
+/**
+ * Handles the rendering of favorite items' bookmarks.
+ */
 @Mixin(InGameHud.class)
 public abstract class MixinInGameHud implements ExtensionInGameHud {
     @Shadow private int scaledWidth;
@@ -24,7 +27,7 @@ public abstract class MixinInGameHud implements ExtensionInGameHud {
     @Shadow protected abstract PlayerEntity getCameraPlayer();
 
     @Override
-    public void setBookmarkFade(int durationMs) {
+    public void itemFavorites$setBookmarkFade(int durationMs) {
         bookmarkFade = durationMs / 100;
         bookmarkSlot = getCameraPlayer().getInventory().selectedSlot;
         bookmarkFadeDivisor = durationMs / 200f;
